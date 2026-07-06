@@ -16,3 +16,6 @@ __pycache__/
 *.tfstate
 *.tfstate.backup
 *.tfvars
+
+# Google Cloud Service Account
+backend/credentials/
