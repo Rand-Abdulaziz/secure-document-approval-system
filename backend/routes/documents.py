@@ -1,5 +1,15 @@
 from flask import Blueprint, request, jsonify, session
-from services.storage_service import upload_file
+from services.firestore_service import (
+    create_document,
+    list_documents,
+    update_document_status,
+    update_document_access_settings,
+    get_document_by_id,
+    increment_download_count,
+    create_notification,
+    create_audit_log,
+)
+from services.storage_service import generate_preview_url, generate_download_url
 
 documents_bp = Blueprint("documents", __name__)
 
@@ -80,6 +90,36 @@ def update_document_settings(document_id):
 
     return jsonify(document)
 
+@documents_bp.route("/api/documents/<document_id>/preview", methods=["GET"])
+def preview_document(document_id):
+    if "username" not in session:
+        return jsonify({"message": "Unauthorized"}), 401
+
+    document = get_document_by_id(document_id)
+
+    if not document:
+        return jsonify({"message": "Document not found"}), 404
+
+    if document.get("status") != "approved":
+        return jsonify({"message": "Document is not approved"}), 403
+
+    if not document.get("storage_path"):
+        return jsonify({"message": "Document file is not available"}), 400
+
+    preview_url = generate_preview_url(document["storage_path"])
+
+    create_audit_log(
+        username=session["username"],
+        action="PREVIEW_DOCUMENT",
+        document_id=document["id"],
+        status="SUCCESS",
+        details=f"Previewed document {document['original_filename']}",
+        ip_address=request.remote_addr,
+    )
+
+    return jsonify({
+        "preview_url": preview_url
+    })
 
 @documents_bp.route("/api/documents/<document_id>/approve", methods=["POST"])
 def approve_document(document_id):
@@ -153,4 +193,46 @@ def reject_document(document_id):
     return jsonify({
         "message": "Document rejected",
         "document": document,
+    })
+    
+@documents_bp.route("/api/documents/<document_id>/download", methods=["GET"])
+def download_document(document_id):
+    if "username" not in session:
+        return jsonify({"message": "Unauthorized"}), 401
+
+    document = get_document_by_id(document_id)
+
+    if not document:
+        return jsonify({"message": "Document not found"}), 404
+
+    if document.get("status") != "approved":
+        return jsonify({"message": "Document is not approved"}), 403
+
+    if not document.get("allow_download"):
+        return jsonify({"message": "Download is not allowed for this document"}), 403
+
+    download_count = document.get("download_count", 0)
+    download_limit = document.get("download_limit", 0)
+
+    if download_limit > 0 and download_count >= download_limit:
+        return jsonify({"message": "Download limit reached"}), 403
+
+    if not document.get("storage_path"):
+        return jsonify({"message": "Document file is not available"}), 400
+
+    download_url = generate_download_url(document["storage_path"])
+
+    increment_download_count(document_id)
+
+    create_audit_log(
+        username=session["username"],
+        action="DOWNLOAD_DOCUMENT",
+        document_id=document["id"],
+        status="SUCCESS",
+        details=f"Downloaded document {document['original_filename']}",
+        ip_address=request.remote_addr,
+    )
+
+    return jsonify({
+        "download_url": download_url
     })

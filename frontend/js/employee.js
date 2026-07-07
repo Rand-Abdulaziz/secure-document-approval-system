@@ -76,10 +76,18 @@ function renderSharedDocuments(documents) {
                 ${doc.download_count || 0} / ${doc.download_limit || 0}
             </td>
 
-            <td>
-                <button class="action-btn">Preview</button>
-                ${doc.allow_download ? `<button class="action-btn">Download</button>` : ""}
-            </td>
+           <td>
+    <button class="action-btn" onclick="previewDocument('${doc.id}')">
+        Preview
+    </button>
+
+    ${doc.allow_download
+                ? `<button class="action-btn" onclick="downloadDocument('${doc.id}')">
+                Download
+            </button>`
+                : ""
+            }
+</td>
         `;
 
         table.appendChild(row);
@@ -126,8 +134,21 @@ function renderDocuments(documents) {
         </td>
 
         <td>
-            ${doc.status === "approved" ? "Available soon" : "-"}
-        </td>
+    <button class="preview-btn"
+        onclick="previewDocument('${doc.id}')">
+        Preview
+    </button>
+
+    ${doc.allow_download
+                ? `
+        <button class="download-btn"
+            onclick="downloadDocument('${doc.id}')">
+            Download
+        </button>
+        `
+                : ""
+            }
+</td>
     `;
 
         table.appendChild(row);
@@ -165,27 +186,67 @@ document.getElementById("allowDownload").addEventListener("change", (e) => {
 
 document.getElementById("submitUpload").addEventListener("click", uploadDocument);
 
-const formData = new FormData();
+async function uploadDocument() {
+    const title = document.getElementById("documentTitle").value;
+    const description = document.getElementById("documentDescription").value;
+    const file = document.getElementById("documentFile").files[0];
+    const allowDownload = document.getElementById("allowDownload").checked;
+    const downloadLimit = allowDownload
+        ? parseInt(document.getElementById("downloadLimit").value)
+        : 0;
 
-formData.append("title", title);
-formData.append("description", description);
-formData.append("file", file);
-formData.append("allow_download", allowDownload);
-formData.append("download_limit", downloadLimit);
+    if (!file) {
+        alert("Please select a file.");
+        return;
+    }
 
-const response = await fetch("/api/documents", {
-    method: "POST",
-    credentials: "include",
-    body: formData
-});
+    const formData = new FormData();
 
-if (!response.ok) {
-    alert("Upload failed.");
-    return;
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("file", file);
+    formData.append("allow_download", allowDownload);
+    formData.append("download_limit", downloadLimit);
+
+    const response = await fetch("/api/documents", {
+        method: "POST",
+        credentials: "include",
+        body: formData
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        alert(error.message || "Upload failed.");
+        return;
+    }
+
+    alert("Document submitted for approval.");
+
+    document.getElementById("uploadModal").style.display = "none";
+
+    await loadEmployeeDashboard();
 }
 
-alert("Document submitted for approval.");
+async function previewDocument(documentId) {
 
-document.getElementById("uploadModal").style.display = "none";
+    const response = await apiRequest(
+        `/documents/${documentId}/preview`
+    );
 
-await loadEmployeeDashboard();
+    window.open(
+        response.preview_url,
+        "_blank"
+    );
+}
+
+async function downloadDocument(documentId) {
+
+    const response = await apiRequest(
+        `/documents/${documentId}/download`
+    );
+
+    window.location.href =
+        response.download_url;
+
+    await loadEmployeeDashboard();
+}

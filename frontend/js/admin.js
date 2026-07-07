@@ -27,10 +27,10 @@ async function loadDashboard() {
     renderNotifications(notifications);
     renderAuditLogs(auditLogs);
     const approvedDocuments = documents.filter(
-    doc => doc.status === "approved"
-);
+        doc => doc.status === "approved"
+    );
 
-renderApprovedDocuments(approvedDocuments);
+    renderApprovedDocuments(approvedDocuments);
 }
 
 function renderStats(documents) {
@@ -169,8 +169,8 @@ function renderApprovedDocuments(documents) {
 
             <td>
                 ${doc.allow_download
-                    ? "View + Download"
-                    : "View Only"}
+                ? "View + Download"
+                : "View Only"}
             </td>
 
             <td>
@@ -179,21 +179,41 @@ function renderApprovedDocuments(documents) {
                 ${doc.download_limit || 0}
             </td>
 
-            <td>
-                <button class="action-btn">
-                    Preview
-                </button>
+    <td>
+    <button class="action-btn" onclick="previewDocument('${doc.id}')">
+        Preview
+    </button>
 
-                ${
-                    doc.allow_download
-                        ? `<button class="action-btn">Download</button>`
-                        : ""
-                }
-            </td>
+    ${doc.allow_download
+                ? `<button class="action-btn" onclick="downloadDocument('${doc.id}')">
+                Download
+            </button>`
+                : ""
+            }
+</td>
         `;
 
         table.appendChild(row);
 
     });
 
+}
+
+async function previewDocument(documentId) {
+    try {
+        const response = await apiRequest(`/documents/${documentId}/preview`);
+        window.open(response.preview_url, "_blank");
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+async function downloadDocument(documentId) {
+    try {
+        const response = await apiRequest(`/documents/${documentId}/download`);
+        window.location.href = response.download_url;
+        await loadDashboard();
+    } catch (error) {
+        alert(error.message);
+    }
 }

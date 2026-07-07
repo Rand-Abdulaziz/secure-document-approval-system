@@ -102,6 +102,34 @@ def update_document_access_settings(document_id, allow_download, download_limit)
         **updated_doc.to_dict()
     }
 
+def get_document_by_id(document_id):
+    doc_ref = db.collection("documents").document(document_id)
+    doc = doc_ref.get()
+
+    if not doc.exists:
+        return None
+
+    return {
+        "id": doc.id,
+        **doc.to_dict()
+    }
+
+
+def increment_download_count(document_id):
+    doc_ref = db.collection("documents").document(document_id)
+
+    doc_ref.update({
+        "download_count": firestore.Increment(1),
+        "updated_at": firestore.SERVER_TIMESTAMP,
+    })
+
+    updated_doc = doc_ref.get()
+
+    return {
+        "id": updated_doc.id,
+        **updated_doc.to_dict()
+    }
+    
 def create_notification(user_id, document_id, notification_type, title, message):
     doc_ref = db.collection("notifications").document()
 
