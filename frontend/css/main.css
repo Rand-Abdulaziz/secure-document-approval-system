@@ -1,0 +1,27 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Inter, Arial, sans-serif;
+}
+
+:root {
+    --bg: #020617;
+    --panel: rgba(15, 23, 42, 0.72);
+    --border: rgba(148, 163, 184, 0.22);
+    --text: #e5e7eb;
+    --muted: #94a3b8;
+    --blue: #2563eb;
+    --purple: #7c3aed;
+    --green: #22c55e;
+    --red: #ef4444;
+}
+
+body {
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at 20% 20%, rgba(37, 99, 235, .35), transparent 30%),
+        radial-gradient(circle at 80% 30%, rgba(124, 58, 237, .35), transparent 35%),
+        linear-gradient(135deg, #020617, #0f172a);
+    color: var(--text);
+}

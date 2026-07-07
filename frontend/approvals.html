@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureDoc Cloud | Approvals</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-mark">▣</div>
+                <span>SecureDoc Cloud</span>
+            </div>
+
+            <nav>
+                <a href="admin.html">Dashboard</a>
+                <a href="documents.html">Documents</a>
+                <a class="active" href="approvals.html">Approvals</a>
+                <a href="notifications.html">Notifications</a>
+                <a href="audit-logs.html">Audit Logs</a>
+            </nav>
+
+            <div class="user-box">
+                <div class="avatar">AD</div>
+                <div>
+                    <strong>Admin User</strong>
+                    <p>Administrator</p>
+                </div>
+            </div>
+        </aside>
+
+        <main class="dashboard-main">
+            <header class="topbar">
+                <div>
+                    <h1>Approvals</h1>
+                    <p>Review pending documents.</p>
+                </div>
+                <button id="logoutButton">Logout</button>
+            </header>
+
+            <section class="panel">
+                <div class="panel-header">
+                    <h2>All Documents</h2>
+                </div>
+
+                <input id="searchInput" class="search-input" placeholder="Search by name, uploader, or status...">
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Document</th>
+                            <th>Uploader</th>
+                            <th>Access</th>
+                            <th>Download Limit</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="approvalsTable"></tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/approvals.js"></script>
+</body>
+
+</html>

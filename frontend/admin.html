@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureDoc Cloud | Admin</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-mark">▣</div>
+                <span>SecureDoc Cloud</span>
+            </div>
+
+            <nav>
+                <a class="active" href="admin.html">Dashboard</a>
+                <a href="documents.html">Documents</a>
+                <a href="approvals.html">Approvals</a>
+                <a href="notifications.html">Notifications</a>
+                <a href="audit-logs.html">Audit Logs</a>
+            </nav>
+
+            <div class="user-box">
+                <div class="avatar">AD</div>
+                <div>
+                    <strong>Admin User</strong>
+                    <p>Administrator</p>
+                </div>
+            </div>
+        </aside>
+
+        <main class="dashboard-main">
+            <header class="topbar">
+                <div>
+                    <h1>Admin Dashboard</h1>
+                    <p>Monitor documents, approvals, notifications and audit activity.</p>
+                </div>
+                <button id="logoutButton">Logout</button>
+            </header>
+
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <p>Total Documents</p>
+                    <h2 id="totalDocs">0</h2>
+                </div>
+                <div class="stat-card pending">
+                    <p>Pending</p>
+                    <h2 id="pendingDocs">0</h2>
+                </div>
+                <div class="stat-card approved">
+                    <p>Approved</p>
+                    <h2 id="approvedDocs">0</h2>
+                </div>
+                <div class="stat-card rejected">
+                    <p>Rejected</p>
+                    <h2 id="rejectedDocs">0</h2>
+                </div>
+            </section>
+
+            <section class="content-grid">
+                <div class="panel large-panel">
+                    <div class="panel-header">
+                        <h2>Recent Documents</h2>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Document</th>
+                                <th>Uploader</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="documentsTable"></tbody>
+                    </table>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>Notifications</h2>
+                    </div>
+                    <div id="notificationsList" class="activity-list"></div>
+                </div>
+
+                <div class="panel wide-panel">
+                    <div class="panel-header">
+                        <h2>Audit Logs</h2>
+                    </div>
+                    <div id="auditLogsList" class="activity-list"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <section class="panel shared-documents-panel">
+    <div class="panel-header">
+        <h2>Approved Company Documents</h2>
+        <p>Documents currently available to all employees.</p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Document</th>
+                <th>Uploaded By</th>
+                <th>Access</th>
+                <th>Downloads</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody id="approvedDocumentsTable"></tbody>
+    </table>
+</section>
+
+    <script src="js/api.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+
+</html>

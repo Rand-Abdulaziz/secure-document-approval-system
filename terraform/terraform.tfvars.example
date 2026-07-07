@@ -1,0 +1,6 @@
+project_id       = "YOUR_GCP_PROJECT_ID"
+region           = "me-central2"
+service_name     = "securedoc-backend"
+bucket_name      = "YOUR_UNIQUE_BUCKET_NAME"
+container_image  = "me-central2-docker.pkg.dev/YOUR_GCP_PROJECT_ID/securedoc-repo/securedoc-backend:latest"
+flask_secret_key = "change-this-secret-key"

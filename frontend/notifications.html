@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureDoc Cloud | Notifications</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-mark">▣</div>
+                <span>SecureDoc Cloud</span>
+            </div>
+
+            <nav>
+            <a href="admin.html">Dashboard</a>
+            <a href="documents.html">Documents</a>
+            <a href="approvals.html">Approvals</a>
+            <a class="active" href="notifications.html">Notifications</a>
+            <a href="audit-logs.html">Audit Logs</a>
+            </nav>
+
+            <div class="user-box">
+                <div class="avatar">AD</div>
+                <div>
+                    <strong>Admin User</strong>
+                    <p>Administrator</p>
+                </div>
+            </div>
+        </aside>
+
+        <main class="dashboard-main">
+            <header class="topbar">
+                <div>
+                    <h1>Notifications</h1>
+                    <p>View all system notifications.</p>
+                </div>
+                <button id="logoutButton">Logout</button>
+            </header>
+
+            <section class="panel">
+                <div class="panel-header">
+                    <h2>All Notifications</h2>
+                </div>
+
+                <div id="notificationsList" class="activity-list"></div>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/notifications.js"></script>
+</body>
+
+</html>
