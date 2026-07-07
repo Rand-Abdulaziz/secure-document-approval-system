@@ -1,6 +1,5 @@
 from flask import Flask
 from flask_cors import CORS
-
 from routes.health import health_bp
 from routes.auth import auth_bp
 from routes.documents import documents_bp

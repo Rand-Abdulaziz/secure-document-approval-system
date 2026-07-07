@@ -86,6 +86,22 @@ def update_document_status(document_id, status, rejection_reason=None):
         **updated_doc.to_dict()
     }, None
 
+def update_document_access_settings(document_id, allow_download, download_limit):
+    doc_ref = db.collection("documents").document(document_id)
+
+    doc_ref.update({
+        "allow_download": allow_download,
+        "download_limit": download_limit,
+        "updated_at": firestore.SERVER_TIMESTAMP,
+    })
+
+    updated_doc = doc_ref.get()
+
+    return {
+        "id": updated_doc.id,
+        **updated_doc.to_dict()
+    }
+
 def create_notification(user_id, document_id, notification_type, title, message):
     doc_ref = db.collection("notifications").document()
 
