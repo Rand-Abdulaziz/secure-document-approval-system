@@ -1,4 +1,3 @@
-import os
 from flask import Flask
 from flask_cors import CORS
 from routes.health import health_bp
@@ -11,16 +10,10 @@ from config import SECRET_KEY
 
 
 def create_app():
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    FRONTEND_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "frontend"))
-    
-    app = Flask(
-        __name__,
-        static_folder=FRONTEND_DIR,
-        static_url_path=""
-    )
+    app = Flask(__name__)
 
     app.secret_key = SECRET_KEY
+
     seed_default_users()
 
     app.config.update(
@@ -36,10 +29,6 @@ def create_app():
     app.register_blueprint(documents_bp)
     app.register_blueprint(notifications_bp)
     app.register_blueprint(audit_logs_bp)
-
-    @app.route("/")
-    def index():
-        return app.send_static_file("login.html")
 
     return app
 

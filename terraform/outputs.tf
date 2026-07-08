@@ -9,3 +9,6 @@ output "artifact_registry_repository" {
 output "cloud_run_service_account" {
   value = google_service_account.cloud_run_sa.email
 }
+output "frontend_bucket_name" {
+  value = google_storage_bucket.frontend.name
+}
