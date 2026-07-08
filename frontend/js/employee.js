@@ -208,7 +208,7 @@ async function uploadDocument() {
     formData.append("allow_download", allowDownload);
     formData.append("download_limit", downloadLimit);
 
-    const response = await fetch("/api/documents", {
+    const response = await fetch(`${API_BASE_URL}/documents`, {
         method: "POST",
         credentials: "include",
         body: formData
