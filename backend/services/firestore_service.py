@@ -1,20 +1,7 @@
 from google.cloud import firestore
-from google.oauth2 import service_account
-import os
 
-credentials = service_account.Credentials.from_service_account_file(
-    os.path.join(
-        os.path.dirname(__file__),
-        "..",
-        "credentials",
-        "service-account.json",
-    )
-)
 
-db = firestore.Client(
-    credentials=credentials,
-    project=credentials.project_id,
-)
+db = firestore.Client()
 
 
 def get_user_by_username(username):
