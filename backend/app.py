@@ -18,8 +18,8 @@ def create_app():
     app.secret_key = SECRET_KEY
 
     app.config.update(
-        SESSION_COOKIE_SAMESITE="Lax",
-        SESSION_COOKIE_SECURE=False,
+        SESSION_COOKIE_SAMESITE="None",
+        SESSION_COOKIE_SECURE=True,
         SESSION_COOKIE_HTTPONLY=True
     )
 
