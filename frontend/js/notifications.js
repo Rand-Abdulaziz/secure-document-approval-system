@@ -3,7 +3,7 @@ async function checkSession() {
         const session = await apiRequest("/session");
 
         if (!session.authenticated) {
-            window.location.href = "/";
+            window.location.href = "login.html";
             return;
         }
 
@@ -13,7 +13,7 @@ async function checkSession() {
         }
 
     } catch (error) {
-        window.location.href = "/";
+        window.location.href = "login.html";
     }
 }
 
@@ -49,7 +49,7 @@ document.getElementById("logoutButton").addEventListener("click", async () => {
         method: "POST"
     });
 
-    window.location.href = "/";
+    window.location.href = "login.html";
 });
 
 (async () => {
