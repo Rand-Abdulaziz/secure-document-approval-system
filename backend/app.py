@@ -1,3 +1,4 @@
+import os
 from flask import Flask
 from flask_cors import CORS
 from routes.health import health_bp
@@ -10,9 +11,12 @@ from config import SECRET_KEY
 
 
 def create_app():
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    FRONTEND_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "frontend"))
+    
     app = Flask(
         __name__,
-        static_folder="../frontend",
+        static_folder=FRONTEND_DIR,
         static_url_path=""
     )
 
