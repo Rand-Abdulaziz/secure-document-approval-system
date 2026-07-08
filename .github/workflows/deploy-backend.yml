@@ -6,7 +6,9 @@ on:
       - main
     paths:
       - "backend/**"
-      - ".github/workflows/deploy-backend.yml"
+      - "Dockerfile"
+      - "requirements.txt"
+       - ".github/workflows/deploy-backend.yml"
 
 env:
   REGION: me-central2

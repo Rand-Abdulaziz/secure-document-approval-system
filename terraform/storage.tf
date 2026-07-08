@@ -1,8 +1,32 @@
 resource "google_storage_bucket" "documents" {
-  name                        = var.bucket_name
-  location                    = var.region
+
+  name = var.bucket_name
+
+  location = var.region
+
   uniform_bucket_level_access = true
-  force_destroy               = true
+
+  force_destroy = true
+
+
+  cors {
+
+    origin = [
+      "*"
+    ]
+
+    method = [
+      "GET",
+      "POST",
+      "PUT"
+    ]
+
+    response_header = [
+      "Content-Type"
+    ]
+
+    max_age_seconds = 3600
+  }
 }
 resource "google_storage_bucket" "frontend" {
   name                        = "securedoc-frontend-${var.project_id}"

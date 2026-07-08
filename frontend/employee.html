@@ -4,135 +4,315 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>SecureDoc Cloud | Employee</title>
+
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/dashboard.css">
 </head>
 
+
 <body>
-    <div class="dashboard-layout">
-        <aside class="sidebar">
-            <div class="logo">
-                <div class="logo-mark">▣</div>
-                <span>SecureDoc Cloud</span>
-            </div>
 
-            <nav>
-                <a class="active" href="employee.html">My Documents</a>
-                <a href="employee-notifications.html">Notifications</a>
-            </nav>
+<div class="dashboard-layout">
 
-            <div class="user-box">
-                <div class="avatar">EM</div>
-                <div>
-                    <strong>Employee User</strong>
-                    <p>Employee</p>
-                </div>
-            </div>
-        </aside>
 
-        <main class="dashboard-main">
-            <header class="topbar">
-                <div>
-                    <h1>Employee Dashboard</h1>
-                    <p>Track your submitted documents and approval status.</p>
-                </div>
-                <button id="logoutButton">Logout</button>
-            </header>
+    <aside class="sidebar">
 
-            <section class="stats-grid">
-                <div class="stat-card">
-                    <p>My Documents</p>
-                    <h2 id="totalDocs">0</h2>
-                </div>
-                <div class="stat-card pending">
-                    <p>Pending</p>
-                    <h2 id="pendingDocs">0</h2>
-                </div>
-                <div class="stat-card approved">
-                    <p>Approved</p>
-                    <h2 id="approvedDocs">0</h2>
-                </div>
-                <div class="stat-card rejected">
-                    <p>Rejected</p>
-                    <h2 id="rejectedDocs">0</h2>
-                </div>
-            </section>
-
-            <section class="panel">
-
-                <div class="panel-header">
-                    <h2>My Documents</h2>
-
-                    <button id="uploadButton" class="action-btn">
-                        + Upload Document
-                    </button>
-                </div>
-
-                <div id="uploadModal" class="modal-overlay" style="display:none;">
-                    <div class="modal-card">
-                        <div class="modal-header">
-                            <h2>Upload Document</h2>
-                            <button id="closeUploadModal" class="icon-button">×</button>
-                        </div>
-
-                        <input type="text" id="documentTitle" placeholder="Document title">
-
-                        <textarea id="documentDescription" placeholder="Description"></textarea>
-
-                        <label class="file-label">Select file</label>
-                        <input type="file" id="documentFile">
-
-                        <label class="checkbox-row">
-                            <input type="checkbox" id="allowDownload">
-                            Allow download
-                        </label>
-
-                        <div id="downloadLimitContainer" style="display:none;">
-                            <label>Download limit</label>
-                            <input type="number" id="downloadLimit" min="1" value="1">
-                        </div>
-
-                        <button id="submitUpload" class="primary-button">Submit for Approval</button>
-                    </div>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Document</th>
-                            <th>Status</th>
-                            <th>Downloads</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="employeeDocumentsTable"></tbody>
-                </table>
-            </section>
-        </main>
-    </div>
-
-    <section class="panel shared-documents-panel">
-        <div class="panel-header">
-            <h2>Approved Company Documents</h2>
-            <p>Company-approved documents available to all employees.</p>
+        <div class="logo">
+            <div class="logo-mark">▣</div>
+            <span>SecureDoc Cloud</span>
         </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Document</th>
-                    <th>Uploaded By</th>
-                    <th>Access</th>
-                    <th>Downloads</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="sharedDocumentsTable"></tbody>
-        </table>
-    </section>
 
-    <script src="js/api.js"></script>
-    <script src="js/employee.js"></script>
+        <nav>
+            <a class="active" href="employee.html">
+                My Documents
+            </a>
+
+            <a href="employee-notifications.html">
+                Notifications
+            </a>
+        </nav>
+
+
+        <div class="user-box">
+
+            <div class="avatar">
+                EM
+            </div>
+
+            <div>
+                <strong>Employee User</strong>
+                <p>Employee</p>
+            </div>
+
+        </div>
+
+
+    </aside>
+
+
+
+    <main class="dashboard-main">
+
+
+        <header class="topbar">
+
+            <div>
+                <h1>Employee Dashboard</h1>
+                <p>
+                    Track your submitted documents and approval status.
+                </p>
+            </div>
+
+            <button id="logoutButton">
+                Logout
+            </button>
+
+        </header>
+
+
+
+        <section class="stats-grid">
+
+            <div class="stat-card">
+                <p>My Documents</p>
+                <h2 id="totalDocs">0</h2>
+            </div>
+
+
+            <div class="stat-card pending">
+                <p>Pending</p>
+                <h2 id="pendingDocs">0</h2>
+            </div>
+
+
+            <div class="stat-card approved">
+                <p>Approved</p>
+                <h2 id="approvedDocs">0</h2>
+            </div>
+
+
+            <div class="stat-card rejected">
+                <p>Rejected</p>
+                <h2 id="rejectedDocs">0</h2>
+            </div>
+
+
+        </section>
+
+
+
+
+        <section class="panel">
+
+
+            <div class="panel-header">
+
+                <h2>My Documents</h2>
+
+
+                <button id="uploadButton" class="action-btn">
+                    + Upload Document
+                </button>
+
+
+            </div>
+
+
+
+
+            <div id="uploadModal" class="modal-overlay" style="display:none;">
+
+
+                <div class="modal-card">
+
+
+                    <div class="modal-header">
+
+                        <h2>
+                            Upload Document
+                        </h2>
+
+
+                        <button 
+                            id="closeUploadModal"
+                            class="icon-button">
+                            ×
+                        </button>
+
+
+                    </div>
+
+
+
+                    <input 
+                        type="text"
+                        id="documentTitle"
+                        placeholder="Document title">
+
+
+
+                    <textarea 
+                        id="documentDescription"
+                        placeholder="Description"></textarea>
+
+
+
+                    <label class="file-label">
+                        Select file
+                    </label>
+
+
+                    <input 
+                        type="file"
+                        id="documentFile">
+
+
+
+                    <label class="checkbox-row">
+
+                        <input 
+                            type="checkbox"
+                            id="allowDownload">
+
+                        Allow download
+
+                    </label>
+
+
+
+
+                    <div 
+                        id="downloadLimitContainer"
+                        style="display:none;">
+
+
+                        <label>
+                            Download limit
+                        </label>
+
+
+                        <input 
+                            type="number"
+                            id="downloadLimit"
+                            min="1"
+                            value="1">
+
+
+                    </div>
+
+
+
+
+                    <button 
+                        id="submitUpload"
+                        class="primary-button">
+
+                        Submit for Approval
+
+                    </button>
+
+
+
+                </div>
+
+
+            </div>
+
+
+
+
+
+            <table>
+
+
+                <thead>
+
+                    <tr>
+                        <th>Document</th>
+                        <th>Status</th>
+                        <th>Downloads</th>
+                        <th>Action</th>
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="employeeDocumentsTable"></tbody>
+
+
+            </table>
+
+
+
+        </section>
+
+
+
+    </main>
+
+
+
+</div>
+
+
+
+
+
+<section class="panel shared-documents-panel">
+
+
+    <div class="panel-header">
+
+        <h2>
+            Approved Company Documents
+        </h2>
+
+        <p>
+            Company-approved documents available to all employees.
+        </p>
+
+    </div>
+
+
+
+    <table>
+
+
+        <thead>
+
+            <tr>
+                <th>Document</th>
+                <th>Uploaded By</th>
+                <th>Access</th>
+                <th>Downloads</th>
+                <th>Action</th>
+            </tr>
+
+        </thead>
+
+
+
+        <tbody id="sharedDocumentsTable"></tbody>
+
+
+
+    </table>
+
+
+
+</section>
+
+
+
+
+
+<script src="js/api.js"></script>
+<script src="js/employee.js"></script>
+
+
 </body>
 
 </html>

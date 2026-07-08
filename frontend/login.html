@@ -1,43 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>SecureDoc Cloud | Login</title>
+
 
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/login.css">
+
 </head>
+
+
 <body>
 
-    <main class="login-page">
-        <section class="brand-panel">
-            <div class="brand-icon">▣</div>
-            <h1>SecureDoc <span>Cloud</span></h1>
-            <p>Smart, secure, and cloud-native document approval system.</p>
-        </section>
 
-        <section class="login-card">
-            <div class="card-header">
-                <h2>Welcome Back</h2>
-                <p>Sign in to continue to your secure workspace.</p>
-            </div>
+<main class="login-page">
 
-            <form id="loginForm">
-                <label>Username</label>
-                <input type="text" id="username" placeholder="Enter your username" required>
 
-                <label>Password</label>
-                <input type="password" id="password" placeholder="Enter your password" required>
+    <section class="brand-panel">
 
-                <button type="submit" id="loginButton">Sign In</button>
+        <div class="brand-icon">
+            ▣
+        </div>
 
-                <p id="message"></p>
-            </form>
-        </section>
-    </main>
+        <h1>
+            SecureDoc <span>Cloud</span>
+        </h1>
 
-    <script src="js/api.js"></script>
-    <script src="js/login.js"></script>
+        <p>
+            Smart, secure, and cloud-native document approval system.
+        </p>
+
+    </section>
+
+
+
+
+    <section class="login-card">
+
+
+        <div class="card-header">
+
+            <h2>
+                Welcome Back
+            </h2>
+
+            <p>
+                Sign in to continue to your secure workspace.
+            </p>
+
+        </div>
+
+
+
+
+        <form id="loginForm">
+
+
+            <label>
+                Username
+            </label>
+
+            <input 
+                type="text"
+                id="username"
+                placeholder="Enter your username"
+                required>
+
+
+
+            <label>
+                Password
+            </label>
+
+
+            <input 
+                type="password"
+                id="password"
+                placeholder="Enter your password"
+                required>
+
+
+
+            <button 
+                type="submit"
+                id="loginButton">
+
+                Sign In
+
+            </button>
+
+
+
+            <p id="message"></p>
+
+
+
+        </form>
+
+
+    </section>
+
+
+
+</main>
+
+
+
+
+<script src="js/api.js"></script>
+<script src="js/login.js"></script>
+
+
 </body>
+
 </html>

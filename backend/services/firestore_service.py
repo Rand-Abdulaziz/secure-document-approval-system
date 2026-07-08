@@ -4,6 +4,18 @@ from google.cloud import firestore
 db = firestore.Client()
 
 
+def serialize_firestore_data(data):
+    result = {}
+
+    for key, value in data.items():
+        if hasattr(value, "isoformat"):
+            result[key] = value.isoformat()
+        else:
+            result[key] = value
+
+    return result
+
+
 def get_user_by_username(username):
     docs = (
         db.collection("users")
@@ -17,8 +29,10 @@ def get_user_by_username(username):
 
     return None
 
+
 def create_document(data):
     doc_ref = db.collection("documents").document()
+
     doc_ref.set({
         **data,
         "status": "pending",
@@ -27,26 +41,37 @@ def create_document(data):
     })
 
     saved_doc = doc_ref.get()
+
     return {
         "id": doc_ref.id,
-        **saved_doc.to_dict()
+        **serialize_firestore_data(saved_doc.to_dict())
     }
 
 
 def list_documents():
-    docs = db.collection("documents").order_by("created_at", direction=firestore.Query.DESCENDING).stream()
+    docs = (
+        db.collection("documents")
+        .order_by(
+            "created_at",
+            direction=firestore.Query.DESCENDING
+        )
+        .stream()
+    )
 
     results = []
+
     for doc in docs:
         results.append({
             "id": doc.id,
-            **doc.to_dict()
+            **serialize_firestore_data(doc.to_dict())
         })
 
     return results
 
+
 def update_document_status(document_id, status, rejection_reason=None):
     doc_ref = db.collection("documents").document(document_id)
+
     doc_snapshot = doc_ref.get()
 
     if not doc_snapshot.exists:
@@ -68,10 +93,12 @@ def update_document_status(document_id, status, rejection_reason=None):
     doc_ref.update(update_data)
 
     updated_doc = doc_ref.get()
+
     return {
         "id": updated_doc.id,
-        **updated_doc.to_dict()
+        **serialize_firestore_data(updated_doc.to_dict())
     }, None
+
 
 def update_document_access_settings(document_id, allow_download, download_limit):
     doc_ref = db.collection("documents").document(document_id)
@@ -86,11 +113,13 @@ def update_document_access_settings(document_id, allow_download, download_limit)
 
     return {
         "id": updated_doc.id,
-        **updated_doc.to_dict()
+        **serialize_firestore_data(updated_doc.to_dict())
     }
+
 
 def get_document_by_id(document_id):
     doc_ref = db.collection("documents").document(document_id)
+
     doc = doc_ref.get()
 
     if not doc.exists:
@@ -98,7 +127,7 @@ def get_document_by_id(document_id):
 
     return {
         "id": doc.id,
-        **doc.to_dict()
+        **serialize_firestore_data(doc.to_dict())
     }
 
 
@@ -114,9 +143,10 @@ def increment_download_count(document_id):
 
     return {
         "id": updated_doc.id,
-        **updated_doc.to_dict()
+        **serialize_firestore_data(updated_doc.to_dict())
     }
-    
+
+
 def create_notification(user_id, document_id, notification_type, title, message):
     doc_ref = db.collection("notifications").document()
 
@@ -134,7 +164,7 @@ def create_notification(user_id, document_id, notification_type, title, message)
 
     return {
         "id": doc_ref.id,
-        **saved_doc.to_dict()
+        **serialize_firestore_data(saved_doc.to_dict())
     }
 
 
@@ -150,7 +180,7 @@ def list_notifications_for_user(user_id):
     for doc in docs:
         results.append({
             "id": doc.id,
-            **doc.to_dict()
+            **serialize_firestore_data(doc.to_dict())
         })
 
     return results
@@ -158,6 +188,12 @@ def list_notifications_for_user(user_id):
 
 def mark_notification_as_read(notification_id):
     doc_ref = db.collection("notifications").document(notification_id)
+
+    doc = doc_ref.get()
+
+    if not doc.exists:
+        return None
+
     doc_ref.update({
         "is_read": True
     })
@@ -166,10 +202,18 @@ def mark_notification_as_read(notification_id):
 
     return {
         "id": updated_doc.id,
-        **updated_doc.to_dict()
+        **serialize_firestore_data(updated_doc.to_dict())
     }
 
-def create_audit_log(username, action, status, details="", document_id=None, ip_address=None):
+
+def create_audit_log(
+    username,
+    action,
+    status,
+    details="",
+    document_id=None,
+    ip_address=None
+):
     doc_ref = db.collection("audit_logs").document()
 
     log_data = {
@@ -190,14 +234,17 @@ def create_audit_log(username, action, status, details="", document_id=None, ip_
 
     return {
         "id": doc_ref.id,
-        **saved_doc.to_dict()
+        **serialize_firestore_data(saved_doc.to_dict())
     }
 
 
 def list_audit_logs():
     docs = (
         db.collection("audit_logs")
-        .order_by("created_at", direction=firestore.Query.DESCENDING)
+        .order_by(
+            "created_at",
+            direction=firestore.Query.DESCENDING
+        )
         .stream()
     )
 
@@ -206,10 +253,11 @@ def list_audit_logs():
     for doc in docs:
         results.append({
             "id": doc.id,
-            **doc.to_dict()
+            **serialize_firestore_data(doc.to_dict())
         })
 
     return results
+
 
 def seed_default_users():
     users = [

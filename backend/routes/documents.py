@@ -9,7 +9,7 @@ from services.firestore_service import (
     create_notification,
     create_audit_log,
 )
-from services.storage_service import generate_preview_url, generate_download_url
+from services.storage_service import generate_preview_url, generate_download_url,upload_file
 
 documents_bp = Blueprint("documents", __name__)
 

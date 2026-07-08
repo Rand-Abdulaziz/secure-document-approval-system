@@ -5,17 +5,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SecureDoc Cloud | Documents</title>
+
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/dashboard.css">
 </head>
 
+
 <body>
+
     <div class="dashboard-layout">
+
         <aside class="sidebar">
+
             <div class="logo">
                 <div class="logo-mark">▣</div>
                 <span>SecureDoc Cloud</span>
             </div>
+
 
             <nav>
                 <a href="admin.html">Dashboard</a>
@@ -28,31 +34,52 @@
 
             <div class="user-box">
                 <div class="avatar">AD</div>
+
                 <div>
                     <strong>Admin User</strong>
                     <p>Administrator</p>
                 </div>
             </div>
+
         </aside>
 
+
+
         <main class="dashboard-main">
+
             <header class="topbar">
+
                 <div>
                     <h1>Documents</h1>
                     <p>Manage uploaded documents and review approval status.</p>
                 </div>
-                <button id="logoutButton">Logout</button>
+
+                <button id="logoutButton">
+                    Logout
+                </button>
+
             </header>
 
+
+
             <section class="panel">
+
                 <div class="panel-header">
                     <h2>All Documents</h2>
                 </div>
 
-                <input id="searchInput" class="search-input" placeholder="Search by name, uploader, or status...">
+
+                <input 
+                    id="searchInput" 
+                    class="search-input"
+                    placeholder="Search by name, uploader, or status..."
+                >
+
 
                 <table>
+
                     <thead>
+
                         <tr>
                             <th>Document</th>
                             <th>Uploader</th>
@@ -60,15 +87,30 @@
                             <th>Downloads</th>
                             <th>Action</th>
                         </tr>
+
                     </thead>
+
+
                     <tbody id="documentsTable"></tbody>
+
+
                 </table>
+
+
             </section>
+
+
         </main>
+
+
     </div>
+
+
 
     <script src="js/api.js"></script>
     <script src="js/documents.js"></script>
+
+
 </body>
 
 </html>

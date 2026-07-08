@@ -1,4 +1,4 @@
-import os
+import uuid
 from datetime import timedelta
 from google.cloud import storage
 from config import GCS_BUCKET_NAME
@@ -9,16 +9,24 @@ def get_storage_client():
 
 
 def upload_file(file, filename):
+
     if not GCS_BUCKET_NAME:
         raise RuntimeError("GCS_BUCKET_NAME is not configured")
 
     client = get_storage_client()
+
     bucket = client.bucket(GCS_BUCKET_NAME)
 
-    blob_name = f"documents/{filename}"
+    safe_filename = f"{uuid.uuid4()}-{filename}"
+
+    blob_name = f"documents/{safe_filename}"
+
     blob = bucket.blob(blob_name)
 
-    blob.upload_from_file(file, content_type=file.content_type)
+    blob.upload_from_file(
+        file,
+        content_type=file.content_type or "application/octet-stream"
+    )
 
     return {
         "storage_provider": "gcs",
@@ -28,8 +36,11 @@ def upload_file(file, filename):
 
 
 def generate_preview_url(storage_path):
+
     client = get_storage_client()
+
     bucket = client.bucket(GCS_BUCKET_NAME)
+
     blob = bucket.blob(storage_path)
 
     return blob.generate_signed_url(
@@ -40,8 +51,11 @@ def generate_preview_url(storage_path):
 
 
 def generate_download_url(storage_path):
+
     client = get_storage_client()
+
     bucket = client.bucket(GCS_BUCKET_NAME)
+
     blob = bucket.blob(storage_path)
 
     return blob.generate_signed_url(

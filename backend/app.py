@@ -22,7 +22,13 @@ def create_app():
         SESSION_COOKIE_HTTPONLY=True
     )
 
-    CORS(app, supports_credentials=True)
+    CORS(
+    app,
+    supports_credentials=True,
+    origins=[
+        "https://storage.googleapis.com"
+    ]
+)
 
     app.register_blueprint(health_bp)
     app.register_blueprint(auth_bp)
