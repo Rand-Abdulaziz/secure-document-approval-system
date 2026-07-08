@@ -210,3 +210,24 @@ def list_audit_logs():
         })
 
     return results
+
+def seed_default_users():
+    users = [
+        {
+            "username": "admin",
+            "password": "admin123",
+            "role": "admin",
+        },
+        {
+            "username": "employee",
+            "password": "employee123",
+            "role": "employee",
+        },
+    ]
+
+    for user in users:
+        doc_ref = db.collection("users").document(user["username"])
+
+        if not doc_ref.get().exists:
+            doc_ref.set(user)
+            print(f"Created default user: {user['username']}")

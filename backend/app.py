@@ -5,6 +5,7 @@ from routes.auth import auth_bp
 from routes.documents import documents_bp
 from routes.notifications import notifications_bp
 from routes.audit_logs import audit_logs_bp
+from services.firestore_service import seed_default_users
 from config import SECRET_KEY
 
 
@@ -16,6 +17,7 @@ def create_app():
     )
 
     app.secret_key = SECRET_KEY
+    seed_default_users()
 
     app.config.update(
         SESSION_COOKIE_SAMESITE="None",
