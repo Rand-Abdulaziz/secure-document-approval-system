@@ -31,3 +31,8 @@ resource "google_project_iam_member" "artifact_registry_reader" {
   member = "serviceAccount:${google_service_account.cloud_run_sa.email}"
 
 }
+resource "google_service_account_iam_member" "cloud_run_signer" {
+  service_account_id = google_service_account.cloud_run_sa.name
+  role               = "roles/iam.serviceAccountTokenCreator"
+  member             = "serviceAccount:${google_service_account.cloud_run_sa.email}"
+}

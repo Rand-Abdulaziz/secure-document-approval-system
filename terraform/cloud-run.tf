@@ -3,6 +3,8 @@ resource "google_cloud_run_v2_service" "backend" {
   name     = var.service_name
   location = var.region
 
+  deletion_protection = false
+
 
   depends_on = [
     google_project_service.run_api,

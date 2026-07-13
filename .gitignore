@@ -20,3 +20,10 @@ terraform/terraform.tfvars
 
 # Google Cloud Service Account
 backend/credentials/
+
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/.terraform/
+cookies.txt
+employee-cookies.txt
+test-document.txt

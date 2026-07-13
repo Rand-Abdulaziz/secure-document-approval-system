@@ -1,5 +1,5 @@
 const API_BASE_URL =
-    "https://securedoc-backend-miwsbflcgq-uc.a.run.app/api";
+    "https://securedoc-backend-364825858975.us-east1.run.app/api";
 
 
 async function apiRequest(endpoint, options = {}) {

@@ -32,3 +32,8 @@ resource "google_project_service" "cloudbuild_api" {
   project = var.project_id
   service = "cloudbuild.googleapis.com"
 }
+resource "google_project_service" "iam_credentials_api" {
+  project            = var.project_id
+  service            = "iamcredentials.googleapis.com"
+  disable_on_destroy = true
+}
