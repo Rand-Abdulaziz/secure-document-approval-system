@@ -236,7 +236,7 @@ def list_notifications_for_user(user_id):
     return results
 
 
-def mark_notification_as_read(notification_id):
+def mark_notification_as_read(notification_id, username):
     doc_ref = db.collection("notifications").document(notification_id)
 
     doc = doc_ref.get()
@@ -244,15 +244,21 @@ def mark_notification_as_read(notification_id):
     if not doc.exists:
         return None
 
+    notification_data = doc.to_dict()
+
+    if notification_data.get("user_id") != username:
+        return None
+
     doc_ref.update({
-        "is_read": True
+        "is_read": True,
+        "updated_at": firestore.SERVER_TIMESTAMP,
     })
 
     updated_doc = doc_ref.get()
 
     return {
         "id": updated_doc.id,
-        **serialize_firestore_data(updated_doc.to_dict())
+        **serialize_firestore_data(updated_doc.to_dict()),
     }
 
 

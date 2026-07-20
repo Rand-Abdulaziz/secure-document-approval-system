@@ -49,6 +49,16 @@ def upload_document_metadata():
             **storage_data,
         }
     )
+    create_notification(
+        user_id="admin",
+        document_id=document["id"],
+        notification_type="pending_approval",
+        title="New document awaiting approval",
+        message=(
+            f"{session['username']} uploaded "
+            f"{document['original_filename']} for review."
+        ),
+    )
 
     create_audit_log(
         username=session["username"],
