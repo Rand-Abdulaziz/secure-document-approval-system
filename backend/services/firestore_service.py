@@ -316,31 +316,41 @@ def list_audit_logs():
     return results
 
 
-def seed_default_users():
+def seed_default_users(
+    admin_password,
+    employee_password,
+):
     users = [
         {
             "username": "admin",
-            "default_password": "admin123",
+            "default_password": admin_password,
             "role": "admin",
         },
         {
             "username": "employee",
-            "default_password": "employee123",
+            "default_password": employee_password,
             "role": "employee",
         },
     ]
 
     for user in users:
         username = user["username"]
+        default_password = user["default_password"]
+
         doc_ref = db.collection("users").document(username)
         user_doc = doc_ref.get()
 
         if not user_doc.exists:
+            if not default_password:
+                raise RuntimeError(
+                    f"Default password for {username} is not configured"
+                )
+
             doc_ref.set(
                 {
                     "username": username,
                     "password_hash": generate_password_hash(
-                        user["default_password"]
+                        default_password
                     ),
                     "role": user["role"],
                     "created_at": firestore.SERVER_TIMESTAMP,
