@@ -268,7 +268,7 @@ function renderApprovedDocuments(documents) {
 
 
             <td>
-                ${doc.download_count || 0}
+                ${doc.user_download_count || 0}
                 /
                 ${doc.download_limit || 0}
             </td>

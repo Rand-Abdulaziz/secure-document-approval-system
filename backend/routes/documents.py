@@ -1,15 +1,21 @@
-from flask import Blueprint, request, jsonify, session
+from flask import Blueprint, jsonify, request, session
+
 from services.firestore_service import (
-    create_document,
-    list_documents,
-    update_document_status,
-    update_document_access_settings,
-    get_document_by_id,
-    increment_download_count,
-    create_notification,
     create_audit_log,
+    create_document,
+    create_notification,
+    get_document_by_id,
+    get_user_download_count,
+    reserve_user_download,
+    list_documents,
+    update_document_access_settings,
+    update_document_status,
 )
-from services.storage_service import generate_preview_url, generate_download_url,upload_file
+from services.storage_service import (
+    generate_download_url,
+    generate_preview_url,
+    upload_file,
+)
 
 documents_bp = Blueprint("documents", __name__)
 
@@ -31,17 +37,18 @@ def upload_document_metadata():
 
     storage_data = upload_file(file, file.filename)
 
-    document = create_document({
-        "title": title,
-        "description": description,
-        "original_filename": file.filename,
-        "uploaded_by": session["username"],
-        "uploaded_by_role": session["role"],
-        "allow_download": allow_download,
-        "download_limit": download_limit,
-        "download_count": 0,
-        **storage_data,
-    })
+    document = create_document(
+        {
+            "title": title,
+            "description": description,
+            "original_filename": file.filename,
+            "uploaded_by": session["username"],
+            "uploaded_by_role": session["role"],
+            "allow_download": allow_download,
+            "download_limit": download_limit,
+            **storage_data,
+        }
+    )
 
     create_audit_log(
         username=session["username"],
@@ -60,8 +67,17 @@ def get_documents():
     if "username" not in session:
         return jsonify({"message": "Unauthorized"}), 401
 
+    username = session["username"]
     documents = list_documents()
+
+    for document in documents:
+        document["user_download_count"] = get_user_download_count(
+            document["id"],
+            username,
+        )
+
     return jsonify(documents)
+
 
 @documents_bp.route("/api/documents/<document_id>/settings", methods=["PATCH"])
 def update_document_settings(document_id):
@@ -76,7 +92,7 @@ def update_document_settings(document_id):
     document = update_document_access_settings(
         document_id=document_id,
         allow_download=data.get("allow_download", False),
-        download_limit=data.get("download_limit", 0)
+        download_limit=data.get("download_limit", 0),
     )
 
     create_audit_log(
@@ -89,6 +105,7 @@ def update_document_settings(document_id):
     )
 
     return jsonify(document)
+
 
 @documents_bp.route("/api/documents/<document_id>/preview", methods=["GET"])
 def preview_document(document_id):
@@ -117,9 +134,8 @@ def preview_document(document_id):
         ip_address=request.remote_addr,
     )
 
-    return jsonify({
-        "preview_url": preview_url
-    })
+    return jsonify({"preview_url": preview_url})
+
 
 @documents_bp.route("/api/documents/<document_id>/approve", methods=["POST"])
 def approve_document(document_id):
@@ -151,10 +167,12 @@ def approve_document(document_id):
         ip_address=request.remote_addr,
     )
 
-    return jsonify({
-        "message": "Document approved",
-        "document": document,
-    })
+    return jsonify(
+        {
+            "message": "Document approved",
+            "document": document,
+        }
+    )
 
 
 @documents_bp.route("/api/documents/<document_id>/reject", methods=["POST"])
@@ -168,7 +186,11 @@ def reject_document(document_id):
     data = request.get_json() or {}
     reason = data.get("reason", "No reason provided")
 
-    document, error = update_document_status(document_id, "rejected", reason)
+    document, error = update_document_status(
+        document_id,
+        "rejected",
+        reason,
+    )
 
     if error:
         return jsonify({"message": error}), 400
@@ -190,11 +212,14 @@ def reject_document(document_id):
         ip_address=request.remote_addr,
     )
 
-    return jsonify({
-        "message": "Document rejected",
-        "document": document,
-    })
-    
+    return jsonify(
+        {
+            "message": "Document rejected",
+            "document": document,
+        }
+    )
+
+
 @documents_bp.route("/api/documents/<document_id>/download", methods=["GET"])
 def download_document(document_id):
     if "username" not in session:
@@ -209,23 +234,35 @@ def download_document(document_id):
         return jsonify({"message": "Document is not approved"}), 403
 
     if not document.get("allow_download"):
-        return jsonify({"message": "Download is not allowed for this document"}), 403
-
-    download_count = document.get("download_count", 0)
-    download_limit = document.get("download_limit", 0)
-
-    if download_limit > 0 and download_count >= download_limit:
-        return jsonify({"message": "Download limit reached"}), 403
+        return jsonify(
+            {"message": "Download is not allowed for this document"}
+        ), 403
 
     if not document.get("storage_path"):
         return jsonify({"message": "Document file is not available"}), 400
 
+    username = session["username"]
+    download_limit = document.get("download_limit", 0)
+
+    download_reservation = reserve_user_download(
+        document_id,
+        username,
+        download_limit,
+    )
+
+    if not download_reservation["allowed"]:
+        return jsonify(
+            {
+                "message": "Download limit reached",
+                "download_count": download_reservation["download_count"],
+                "download_limit": download_limit,
+            }
+        ), 403
+
     download_url = generate_download_url(document["storage_path"])
 
-    increment_download_count(document_id)
-
     create_audit_log(
-        username=session["username"],
+        username=username,
         action="DOWNLOAD_DOCUMENT",
         document_id=document["id"],
         status="SUCCESS",
@@ -233,6 +270,10 @@ def download_document(document_id):
         ip_address=request.remote_addr,
     )
 
-    return jsonify({
-        "download_url": download_url
-    })
+    return jsonify(
+        {
+            "download_url": download_url,
+            "download_count": download_reservation["download_count"],
+            "download_limit": download_limit,
+        }
+    )

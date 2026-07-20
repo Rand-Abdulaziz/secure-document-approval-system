@@ -131,20 +131,70 @@ def get_document_by_id(document_id):
     }
 
 
-def increment_download_count(document_id):
-    doc_ref = db.collection("documents").document(document_id)
+@firestore.transactional
+def _reserve_user_download(transaction, usage_ref, download_limit):
+    usage_snapshot = usage_ref.get(transaction=transaction)
 
-    doc_ref.update({
-        "download_count": firestore.Increment(1),
-        "updated_at": firestore.SERVER_TIMESTAMP,
-    })
+    if usage_snapshot.exists:
+        download_count = usage_snapshot.to_dict().get("download_count", 0)
+    else:
+        download_count = 0
 
-    updated_doc = doc_ref.get()
+    if download_limit > 0 and download_count >= download_limit:
+        return {
+            "allowed": False,
+            "download_count": download_count,
+        }
+
+    new_download_count = download_count + 1
+
+    transaction.set(
+        usage_ref,
+        {
+            "username": usage_ref.id,
+            "download_count": new_download_count,
+            "updated_at": firestore.SERVER_TIMESTAMP,
+        },
+        merge=True,
+    )
 
     return {
-        "id": updated_doc.id,
-        **serialize_firestore_data(updated_doc.to_dict())
+        "allowed": True,
+        "download_count": new_download_count,
     }
+
+
+def reserve_user_download(document_id, username, download_limit):
+    usage_ref = (
+        db.collection("documents")
+        .document(document_id)
+        .collection("download_usage")
+        .document(username)
+    )
+
+    transaction = db.transaction()
+
+    return _reserve_user_download(
+        transaction,
+        usage_ref,
+        download_limit,
+    )
+
+
+def get_user_download_count(document_id, username):
+    usage_ref = (
+        db.collection("documents")
+        .document(document_id)
+        .collection("download_usage")
+        .document(username)
+    )
+
+    usage_doc = usage_ref.get()
+
+    if not usage_doc.exists:
+        return 0
+
+    return usage_doc.to_dict().get("download_count", 0)
 
 
 def create_notification(user_id, document_id, notification_type, title, message):
