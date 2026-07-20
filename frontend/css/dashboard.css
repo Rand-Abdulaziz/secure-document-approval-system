@@ -347,3 +347,42 @@ td {
 .shared-documents-panel {
     margin-top: 24px;
 }
+
+.notification-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.notification-status {
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.notification-date {
+    display: block;
+    margin-top: 8px;
+    opacity: 0.7;
+}
+
+.notification-unread {
+    font-weight: 500;
+    border-left: 4px solid currentColor;
+}
+
+.notification-read {
+    opacity: 0.7;
+}
+
+.notification-unread .notification-status {
+    font-weight: 700;
+}
+
+.notification-read .notification-status {
+    font-weight: 400;
+}
+
+.notification-unread .action-btn {
+    margin-top: 10px;
+}
