@@ -200,7 +200,10 @@ def reject_document(document_id):
         document_id=document["id"],
         notification_type="rejected",
         title="Document rejected",
-        message=f"Your document {document['original_filename']} has been rejected.",
+        message=(
+            f"Your document {document['original_filename']} has been rejected. "
+            f"Reason: {reason}"
+        ),
     )
 
     create_audit_log(
@@ -208,10 +211,12 @@ def reject_document(document_id):
         action="REJECT_DOCUMENT",
         document_id=document["id"],
         status="SUCCESS",
-        details=f"Rejected document {document['original_filename']}",
+        details=(
+            f"Rejected document {document['original_filename']}. "
+            f"Reason: {reason}"
+        ),
         ip_address=request.remote_addr,
     )
-
     return jsonify(
         {
             "message": "Document rejected",
