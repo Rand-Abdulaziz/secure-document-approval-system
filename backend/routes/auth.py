@@ -1,26 +1,41 @@
-from flask import Blueprint, request, jsonify, session
-from services.firestore_service import get_user_by_username, create_audit_log
+from flask import Blueprint, jsonify, request, session
+from werkzeug.security import check_password_hash
+
+from services.firestore_service import (
+    create_audit_log,
+    get_user_by_username,
+)
 
 auth_bp = Blueprint("auth", __name__)
 
 
 @auth_bp.route("/api/login", methods=["POST"])
 def login():
-    data = request.get_json()
+    data = request.get_json() or {}
 
     username = data.get("username")
     password = data.get("password")
 
     user = get_user_by_username(username)
 
-    if not user or user["password"] != password:
+    password_is_valid = (
+        user
+        and user.get("password_hash")
+        and password
+        and check_password_hash(
+            user["password_hash"],
+            password,
+        )
+    )
+
+    if not password_is_valid:
         create_audit_log(
-            username=username,
+            username=username or "unknown",
             action="LOGIN_FAILED",
             document_id=None,
             status="FAILED",
             details="Invalid credentials",
-            ip_address=request.remote_addr
+            ip_address=request.remote_addr,
         )
 
         return jsonify({"message": "Invalid credentials"}), 401
@@ -34,13 +49,15 @@ def login():
         document_id=None,
         status="SUCCESS",
         details="User logged in",
-        ip_address=request.remote_addr
+        ip_address=request.remote_addr,
     )
 
-    return jsonify({
-        "message": "Login successful",
-        "role": user["role"]
-    })
+    return jsonify(
+        {
+            "message": "Login successful",
+            "role": user["role"],
+        }
+    )
 
 
 @auth_bp.route("/api/session", methods=["GET"])
@@ -48,16 +65,17 @@ def get_session():
     if "username" not in session:
         return jsonify({"authenticated": False}), 401
 
-    return jsonify({
-        "authenticated": True,
-        "username": session["username"],
-        "role": session["role"]
-    })
+    return jsonify(
+        {
+            "authenticated": True,
+            "username": session["username"],
+            "role": session["role"],
+        }
+    )
 
 
 @auth_bp.route("/api/logout", methods=["POST"])
 def logout():
-
     if "username" not in session:
         return jsonify({"message": "Unauthorized"}), 401
 
@@ -67,7 +85,7 @@ def logout():
         document_id=None,
         status="SUCCESS",
         details="User logged out",
-        ip_address=request.remote_addr
+        ip_address=request.remote_addr,
     )
 
     session.clear()

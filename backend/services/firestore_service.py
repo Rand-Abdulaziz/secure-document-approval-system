@@ -1,4 +1,5 @@
 from google.cloud import firestore
+from werkzeug.security import generate_password_hash
 
 
 db = firestore.Client()
@@ -319,19 +320,50 @@ def seed_default_users():
     users = [
         {
             "username": "admin",
-            "password": "admin123",
+            "default_password": "admin123",
             "role": "admin",
         },
         {
             "username": "employee",
-            "password": "employee123",
+            "default_password": "employee123",
             "role": "employee",
         },
     ]
 
     for user in users:
-        doc_ref = db.collection("users").document(user["username"])
+        username = user["username"]
+        doc_ref = db.collection("users").document(username)
+        user_doc = doc_ref.get()
 
-        if not doc_ref.get().exists:
-            doc_ref.set(user)
-            print(f"Created default user: {user['username']}")
+        if not user_doc.exists:
+            doc_ref.set(
+                {
+                    "username": username,
+                    "password_hash": generate_password_hash(
+                        user["default_password"]
+                    ),
+                    "role": user["role"],
+                    "created_at": firestore.SERVER_TIMESTAMP,
+                }
+            )
+
+            print(f"Created default user: {username}")
+            continue
+
+        existing_user = user_doc.to_dict()
+
+        if (
+            existing_user.get("password")
+            and not existing_user.get("password_hash")
+        ):
+            doc_ref.update(
+                {
+                    "password_hash": generate_password_hash(
+                        existing_user["password"]
+                    ),
+                    "password": firestore.DELETE_FIELD,
+                    "updated_at": firestore.SERVER_TIMESTAMP,
+                }
+            )
+
+            print(f"Migrated password for user: {username}")
