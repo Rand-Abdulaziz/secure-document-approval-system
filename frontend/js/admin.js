@@ -69,10 +69,9 @@ function renderDocuments(documents) {
             </td>
 
             <td>
-                ${
-                    doc.status === "pending"
-                    ?
-                    `
+                ${doc.status === "pending"
+                ?
+                `
                     <button class="action-btn"
                     onclick="approveDocument('${doc.id}')">
                     Approve
@@ -83,9 +82,9 @@ function renderDocuments(documents) {
                     Reject
                     </button>
                     `
-                    :
-                    "-"
-                }
+                :
+                "-"
+            }
             </td>
         `;
 
@@ -147,10 +146,9 @@ function renderNotifications(notifications) {
                 ${formatNotificationDate(notification.created_at)}
             </small>
 
-            ${
-                notification.is_read
-                    ? ""
-                    : `
+            ${notification.is_read
+                ? ""
+                : `
                         <button
                             class="action-btn"
                             onclick="markDashboardNotificationAsRead('${notification.id}')"
@@ -183,20 +181,53 @@ async function markDashboardNotificationAsRead(notificationId) {
 
 
 function renderAuditLogs(logs) {
-
     const list = document.getElementById("auditLogsList");
+
+    if (!list) {
+        return;
+    }
 
     list.innerHTML = "";
 
-    logs.slice(0, 6).forEach((log) => {
+    if (!logs.length) {
+        list.innerHTML = `
+            <p class="muted">
+                No audit logs yet.
+            </p>
+        `;
 
+        return;
+    }
+
+    logs.slice(0, 6).forEach((log) => {
         const div = document.createElement("div");
 
         div.className = "activity-item";
 
         div.innerHTML = `
-            <strong>${log.action}</strong>
-            <p>${log.details} · ${log.username}</p>
+            <div class="audit-log-header">
+                <strong>
+                    ${log.action || "UNKNOWN"}
+                </strong>
+
+                <span class="audit-status ${String(log.status || "").toLowerCase()}">
+                    ${log.status || "UNKNOWN"}
+                </span>
+            </div>
+
+            <p>
+                ${log.details || "No details available."}
+            </p>
+
+            <div class="audit-log-meta">
+                <span>
+                    User: ${log.username || "unknown"}
+                </span>
+
+                <span>
+                    ${formatNotificationDate(log.created_at)}
+                </span>
+            </div>
         `;
 
         list.appendChild(div);
@@ -318,13 +349,12 @@ function renderApprovedDocuments(documents) {
 
 
             <td>
-                ${
-                    doc.allow_download
-                    ?
-                    "View + Download"
-                    :
-                    "View Only"
-                }
+                ${doc.allow_download
+                ?
+                "View + Download"
+                :
+                "View Only"
+            }
             </td>
 
 
@@ -343,18 +373,17 @@ function renderApprovedDocuments(documents) {
                 </button>
 
 
-                ${
-                    doc.allow_download
-                    ?
-                    `
+                ${doc.allow_download
+                ?
+                `
                     <button class="action-btn"
                     onclick="downloadDocument('${doc.id}')">
                         Download
                     </button>
                     `
-                    :
-                    ""
-                }
+                :
+                ""
+            }
 
             </td>
 
@@ -383,7 +412,7 @@ async function previewDocument(documentId) {
         );
 
 
-    } catch(error) {
+    } catch (error) {
 
         alert(error.message);
 
@@ -409,7 +438,7 @@ async function downloadDocument(documentId) {
         await loadDashboard();
 
 
-    } catch(error) {
+    } catch (error) {
 
         alert(error.message);
 

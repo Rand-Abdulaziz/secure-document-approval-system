@@ -386,3 +386,34 @@ td {
 .notification-unread .action-btn {
     margin-top: 10px;
 }
+
+.audit-log-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.audit-status {
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.audit-status.success {
+    opacity: 1;
+}
+
+.audit-status.failed,
+.audit-status.failure,
+.audit-status.error {
+    font-weight: 800;
+}
+
+.audit-log-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    margin-top: 8px;
+    font-size: 0.82rem;
+    opacity: 0.7;
+}
