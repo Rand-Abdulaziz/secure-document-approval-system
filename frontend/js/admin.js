@@ -93,10 +93,27 @@ function renderDocuments(documents) {
     });
 }
 
+function formatNotificationDate(createdAt) {
+    if (!createdAt) {
+        return "Date unavailable";
+    }
+
+    const date = new Date(createdAt);
+
+    if (Number.isNaN(date.getTime())) {
+        return "Date unavailable";
+    }
+
+    return date.toLocaleString();
+}
 
 function renderNotifications(notifications) {
-
     const list = document.getElementById("notificationsList");
+
+    if (!list) {
+        return;
+    }
+
     list.innerHTML = "";
 
     if (!notifications.length) {
@@ -104,20 +121,64 @@ function renderNotifications(notifications) {
         return;
     }
 
-
-    notifications.slice(0, 5).forEach((item) => {
-
+    notifications.slice(0, 5).forEach((notification) => {
         const div = document.createElement("div");
 
-        div.className = "activity-item";
+        div.className = notification.is_read
+            ? "activity-item notification-read"
+            : "activity-item notification-unread";
 
         div.innerHTML = `
-            <strong>${item.title}</strong>
-            <p>${item.message}</p>
+            <div class="notification-header">
+                <strong>
+                    ${notification.title || "Notification"}
+                </strong>
+
+                <span class="notification-status">
+                    ${notification.is_read ? "Read" : "Unread"}
+                </span>
+            </div>
+
+            <p>
+                ${notification.message || ""}
+            </p>
+
+            <small class="notification-date">
+                ${formatNotificationDate(notification.created_at)}
+            </small>
+
+            ${
+                notification.is_read
+                    ? ""
+                    : `
+                        <button
+                            class="action-btn"
+                            onclick="markDashboardNotificationAsRead('${notification.id}')"
+                        >
+                            Mark as read
+                        </button>
+                    `
+            }
         `;
 
         list.appendChild(div);
     });
+}
+
+async function markDashboardNotificationAsRead(notificationId) {
+    try {
+        await apiRequest(
+            `/notifications/${notificationId}/read`,
+            {
+                method: "POST"
+            }
+        );
+
+        await loadDashboard();
+
+    } catch (error) {
+        alert(error.message);
+    }
 }
 
 
