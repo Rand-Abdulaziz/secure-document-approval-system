@@ -248,12 +248,24 @@ if (logoutButton) {
 })();
 
 
+function resetUploadForm() {
+    document.getElementById("documentTitle").value = "";
+    document.getElementById("documentDescription").value = "";
+    document.getElementById("documentFile").value = "";
+    document.getElementById("allowDownload").checked = false;
+    document.getElementById("downloadLimit").value = "1";
+    document.getElementById("downloadLimitContainer").style.display = "none";
+}
+
+
 const uploadButton =
     document.getElementById("uploadButton");
 
 
 if (uploadButton) {
     uploadButton.onclick = () => {
+        resetUploadForm();
+
         document.getElementById("uploadModal").style.display = "flex";
     };
 }
@@ -265,6 +277,8 @@ const closeUploadModal =
 
 if (closeUploadModal) {
     closeUploadModal.onclick = () => {
+        resetUploadForm();
+
         document.getElementById("uploadModal").style.display = "none";
     };
 }
@@ -349,6 +363,8 @@ async function uploadDocument() {
     }
 
     alert("Document submitted for approval.");
+
+    resetUploadForm();
 
     document.getElementById("uploadModal").style.display =
         "none";
