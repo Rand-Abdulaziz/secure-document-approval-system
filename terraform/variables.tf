@@ -24,9 +24,3 @@ variable "container_image" {
   description = "Docker image URL for Cloud Run"
   type        = string
 }
-
-variable "flask_secret_key" {
-  description = "Flask secret key"
-  type        = string
-  sensitive   = true
-}
