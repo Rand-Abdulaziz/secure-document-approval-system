@@ -27,6 +27,26 @@ ALLOWED_EXTENSIONS = {
     "pptx",
     "txt",
 }
+ALLOWED_MIME_TYPES = {
+    "pdf": {
+        "application/pdf",
+    },
+    "doc": {
+        "application/msword",
+    },
+    "docx": {
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    },
+    "ppt": {
+        "application/vnd.ms-powerpoint",
+    },
+    "pptx": {
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    },
+    "txt": {
+        "text/plain",
+    },
+}
 
 MAX_FILE_SIZE = 10 * 1024 * 1024
 
@@ -36,6 +56,9 @@ def is_allowed_file(filename):
         "." in filename
         and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
     )
+
+def get_file_extension(filename):
+    return filename.rsplit(".", 1)[1].lower()
 
 
 @documents_bp.route("/api/documents", methods=["POST"])
@@ -51,16 +74,33 @@ def upload_document_metadata():
     if not file or not file.filename:
         return jsonify({"message": "No file selected"}), 400
 
-    safe_filename = secure_filename(file.filename)
+    original_filename = file.filename
 
-    if not safe_filename:
-        return jsonify({"message": "Invalid filename"}), 400
-
-    if not is_allowed_file(safe_filename):
+    if not is_allowed_file(original_filename):
         return jsonify(
             {
                 "message": (
                     "Only PDF, Word, PowerPoint, and TXT files are allowed"
+                )
+            }
+        ), 400
+
+    file_extension = get_file_extension(original_filename)
+
+    safe_filename = secure_filename(original_filename)
+
+    if not safe_filename or "." not in safe_filename:
+        safe_filename = f"document.{file_extension}"
+
+    allowed_mime_types = ALLOWED_MIME_TYPES[file_extension]
+    file_mime_type = file.mimetype
+
+    if file_mime_type not in allowed_mime_types:
+        return jsonify(
+            {
+                "message": (
+                    "The file content type does not match "
+                    f"the .{file_extension} extension"
                 )
             }
         ), 400
@@ -104,7 +144,7 @@ def upload_document_metadata():
         {
             "title": title,
             "description": description,
-            "original_filename": file.filename,
+            "original_filename": original_filename,
             "uploaded_by": session["username"],
             "uploaded_by_role": session["role"],
             "allow_download": allow_download,
