@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request, session
+from werkzeug.utils import secure_filename
 
 from services.firestore_service import (
     create_audit_log,
@@ -18,6 +19,23 @@ from services.storage_service import (
 )
 
 documents_bp = Blueprint("documents", __name__)
+ALLOWED_EXTENSIONS = {
+    "pdf",
+    "doc",
+    "docx",
+    "ppt",
+    "pptx",
+    "txt",
+}
+
+MAX_FILE_SIZE = 10 * 1024 * 1024
+
+
+def is_allowed_file(filename):
+    return (
+        "." in filename
+        and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+    )
 
 
 @documents_bp.route("/api/documents", methods=["POST"])
@@ -30,12 +48,57 @@ def upload_document_metadata():
 
     file = request.files["file"]
 
+    if not file or not file.filename:
+        return jsonify({"message": "No file selected"}), 400
+
+    safe_filename = secure_filename(file.filename)
+
+    if not safe_filename:
+        return jsonify({"message": "Invalid filename"}), 400
+
+    if not is_allowed_file(safe_filename):
+        return jsonify(
+            {
+                "message": (
+                    "Only PDF, Word, PowerPoint, and TXT files are allowed"
+                )
+            }
+        ), 400
+
+    file.stream.seek(0, 2)
+    file_size = file.stream.tell()
+    file.stream.seek(0)
+
+    if file_size == 0:
+        return jsonify({"message": "The selected file is empty"}), 400
+
+    if file_size > MAX_FILE_SIZE:
+        return jsonify(
+            {"message": "File size must not exceed 10 MB"}
+        ), 413
+
     title = request.form.get("title")
     description = request.form.get("description")
     allow_download = request.form.get("allow_download") == "true"
-    download_limit = int(request.form.get("download_limit", 0))
 
-    storage_data = upload_file(file, file.filename)
+    try:
+        download_limit = int(
+            request.form.get("download_limit", 0)
+        )
+    except (TypeError, ValueError):
+        return jsonify(
+            {"message": "Download limit must be a valid whole number"}
+        ), 400
+
+    if allow_download and download_limit < 1:
+        return jsonify(
+            {"message": "Download limit must be at least 1"}
+        ), 400
+
+    if not allow_download:
+        download_limit = 0
+
+    storage_data = upload_file(file, safe_filename)
 
     document = create_document(
         {
@@ -49,6 +112,7 @@ def upload_document_metadata():
             **storage_data,
         }
     )
+
     create_notification(
         user_id="admin",
         document_id=document["id"],

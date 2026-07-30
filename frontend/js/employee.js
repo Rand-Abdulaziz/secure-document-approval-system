@@ -1,5 +1,23 @@
 let currentUser = null;
 
+const ALLOWED_FILE_EXTENSIONS = [
+    "pdf",
+    "doc",
+    "docx",
+    "ppt",
+    "pptx",
+    "txt"
+];
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+
+function getFileExtension(filename) {
+    return filename
+        .split(".")
+        .pop()
+        .toLowerCase();
+}
+
 function hasReachedDownloadLimit(doc) {
     const usedDownloads = Number(doc.user_download_count || 0);
     const downloadLimit = Number(doc.download_limit || 0);
@@ -84,20 +102,18 @@ function renderSharedDocuments(documents) {
 
             <td>
                 <span class="badge ${doc.allow_download ? "approved" : "pending"}">
-                    ${
-                        doc.allow_download
-                            ? "View + Download"
-                            : "View Only"
-                    }
+                    ${doc.allow_download
+                ? "View + Download"
+                : "View Only"
+            }
                 </span>
             </td>
 
             <td>
-                ${
-                    doc.allow_download
-                        ? `${doc.user_download_count || 0} / ${doc.download_limit || 0}`
-                        : "View Only"
-                }
+                ${doc.allow_download
+                ? `${doc.user_download_count || 0} / ${doc.download_limit || 0}`
+                : "View Only"
+            }
             </td>
 
             <td>
@@ -108,10 +124,9 @@ function renderSharedDocuments(documents) {
                     Preview
                 </button>
 
-                ${
-                    doc.allow_download
-                        ? hasReachedDownloadLimit(doc)
-                            ? `
+                ${doc.allow_download
+                ? hasReachedDownloadLimit(doc)
+                    ? `
                                 <button
                                     class="download-btn"
                                     disabled
@@ -119,7 +134,7 @@ function renderSharedDocuments(documents) {
                                     Limit Reached
                                 </button>
                             `
-                            : `
+                    : `
                                 <button
                                     class="download-btn"
                                     onclick="downloadDocument('${doc.id}')"
@@ -127,8 +142,8 @@ function renderSharedDocuments(documents) {
                                     Download
                                 </button>
                             `
-                        : ""
-                }
+                : ""
+            }
             </td>
         `;
 
@@ -196,19 +211,17 @@ function renderDocuments(documents) {
             </td>
 
             <td>
-                ${
-                    doc.status !== "approved"
-                        ? "Not available"
-                        : doc.allow_download
-                            ? `${doc.user_download_count || 0} / ${doc.download_limit || 0}`
-                            : "View Only"
-                }
+                ${doc.status !== "approved"
+                ? "Not available"
+                : doc.allow_download
+                    ? `${doc.user_download_count || 0} / ${doc.download_limit || 0}`
+                    : "View Only"
+            }
             </td>
 
             <td>
-                ${
-                    doc.status === "approved"
-                        ? `
+                ${doc.status === "approved"
+                ? `
                             <button
                                 class="preview-btn"
                                 onclick="previewDocument('${doc.id}')"
@@ -216,17 +229,16 @@ function renderDocuments(documents) {
                                 Preview
                             </button>
                         `
-                        : `
+                : `
                             <span class="muted-text">
                                 Not available
                             </span>
                         `
-                }
+            }
 
-                ${
-                    doc.status === "approved" && doc.allow_download
-                        ? hasReachedDownloadLimit(doc)
-                            ? `
+                ${doc.status === "approved" && doc.allow_download
+                ? hasReachedDownloadLimit(doc)
+                    ? `
                                 <button
                                     class="download-btn"
                                     disabled
@@ -234,7 +246,7 @@ function renderDocuments(documents) {
                                     Limit Reached
                                 </button>
                             `
-                            : `
+                    : `
                                 <button
                                     class="download-btn"
                                     onclick="downloadDocument('${doc.id}')"
@@ -242,8 +254,8 @@ function renderDocuments(documents) {
                                     Download
                                 </button>
                             `
-                        : ""
-                }
+                : ""
+            }
             </td>
         `;
 
@@ -357,6 +369,38 @@ async function uploadDocument() {
 
     if (!file) {
         alert("Please select a file.");
+        return;
+    }
+
+    const fileExtension = getFileExtension(file.name);
+
+    if (!ALLOWED_FILE_EXTENSIONS.includes(fileExtension)) {
+        alert(
+            "Only PDF, Word, PowerPoint, and TXT files are allowed."
+        );
+        return;
+    }
+
+    if (file.size === 0) {
+        alert("The selected file is empty.");
+        return;
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+        alert("File size must not exceed 10 MB.");
+        return;
+    }
+
+    if (
+        allowDownload
+        && (
+            !Number.isInteger(downloadLimit)
+            || downloadLimit < 1
+        )
+    ) {
+        alert(
+            "Download limit must be a whole number of at least 1."
+        );
         return;
     }
 
