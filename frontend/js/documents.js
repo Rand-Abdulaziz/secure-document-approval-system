@@ -112,9 +112,7 @@ function renderDocuments(documents) {
 
 
             <td>
-                ${doc.user_download_count || 0}
-                /
-                ${doc.download_limit || 0}
+                ${doc.allow_download ? `${doc.user_download_count || 0} / ${doc.download_limit || 0}` : "View Only"}
             </td>
 
 

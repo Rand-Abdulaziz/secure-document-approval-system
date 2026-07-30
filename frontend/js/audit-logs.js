@@ -90,10 +90,6 @@ function renderAuditLogs(logs) {
                 </span>
 
                 <span>
-                    IP: ${log.ip_address || "Unavailable"}
-                </span>
-
-                <span>
                     ${formatAuditDate(log.created_at)}
                 </span>
             </div>
