@@ -451,3 +451,36 @@ td {
     cursor: not-allowed;
     transform: none;
 }
+
+.modal-header p {
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.secondary-button {
+    padding: 10px 16px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--text);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.secondary-button:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.form-error {
+    margin: -4px 0 14px;
+    color: #fca5a5;
+    font-size: 0.85rem;
+}

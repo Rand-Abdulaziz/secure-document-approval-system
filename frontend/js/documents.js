@@ -190,55 +190,41 @@ async function approveDocument(id) {
 
 }
 
+let documentPendingRejectionId = null;
 
+function openRejectModal(id) {
+    documentPendingRejectionId = id;
 
+    const documentData = documentsCache.find((doc) => doc.id === id);
 
-async function rejectDocument(id) {
+    const modal = document.getElementById("rejectModal");
+    const documentName = document.getElementById("rejectDocumentName");
+    const reasonInput = document.getElementById("rejectionReason");
+    const reasonError = document.getElementById("rejectionReasonError");
 
+    documentName.textContent = documentData
+        ? `Reject "${documentData.original_filename || "Untitled"}"`
+        : "Provide a reason for rejection.";
 
-    try {
+    reasonInput.value = "";
+    reasonError.style.display = "none";
+    modal.style.display = "flex";
 
-        const reason = prompt("Reason for rejection:");
+    reasonInput.focus();
+}
 
-        if (reason === null) return;
+function closeRejectModal() {
+    documentPendingRejectionId = null;
 
-        if (!reason.trim()) {
-            alert("A rejection reason is required.");
-            return;
-        }
-
-
-
-        await apiRequest(`/documents/${id}/reject`, {
-
-            method: "POST",
-
-            body: JSON.stringify({
-
-                reason: reason.trim()
-
-            })
-
-        });
-
-
-
-        await loadDocuments();
-
-
-
-    } catch (error) {
-
-
-        alert(error.message);
-
-
-    }
-
+    document.getElementById("rejectModal").style.display = "none";
+    document.getElementById("rejectionReason").value = "";
+    document.getElementById("rejectionReasonError").style.display = "none";
 }
 
 
-
+function rejectDocument(id) {
+    openRejectModal(id);
+}
 
 
 const searchInput = document.getElementById("searchInput");
@@ -333,7 +319,65 @@ if (logoutButton) {
 }
 
 
+const closeRejectModalButton =
+    document.getElementById("closeRejectModal");
 
+const cancelRejectButton =
+    document.getElementById("cancelRejectButton");
+
+const confirmRejectButton =
+    document.getElementById("confirmRejectButton");
+
+if (closeRejectModalButton) {
+    closeRejectModalButton.addEventListener("click", closeRejectModal);
+}
+
+if (cancelRejectButton) {
+    cancelRejectButton.addEventListener("click", closeRejectModal);
+}
+
+if (confirmRejectButton) {
+    confirmRejectButton.addEventListener("click", async () => {
+        const reasonInput =
+            document.getElementById("rejectionReason");
+
+        const reasonError =
+            document.getElementById("rejectionReasonError");
+
+        const reason = reasonInput.value.trim();
+
+        if (!reason) {
+            reasonError.style.display = "block";
+            reasonInput.focus();
+            return;
+        }
+
+        if (!documentPendingRejectionId) return;
+
+        try {
+            confirmRejectButton.disabled = true;
+            confirmRejectButton.textContent = "Rejecting...";
+
+            await apiRequest(
+                `/documents/${documentPendingRejectionId}/reject`,
+                {
+                    method: "POST",
+                    body: JSON.stringify({
+                        reason
+                    })
+                }
+            );
+
+            closeRejectModal();
+            await loadDocuments();
+        } catch (error) {
+            alert(error.message);
+        } finally {
+            confirmRejectButton.disabled = false;
+            confirmRejectButton.textContent = "Confirm Reject";
+        }
+    });
+}
 
 
 (async () => {
