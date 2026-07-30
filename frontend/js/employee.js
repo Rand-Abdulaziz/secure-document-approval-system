@@ -1,5 +1,11 @@
 let currentUser = null;
 
+function hasReachedDownloadLimit(doc) {
+    const usedDownloads = Number(doc.user_download_count || 0);
+    const downloadLimit = Number(doc.download_limit || 0);
+
+    return doc.allow_download && usedDownloads >= downloadLimit;
+}
 
 async function checkSession() {
     try {
@@ -78,9 +84,10 @@ function renderSharedDocuments(documents) {
 
             <td>
                 <span class="badge ${doc.allow_download ? "approved" : "pending"}">
-                    ${doc.allow_download
-                        ? "View + Download"
-                        : "View Only"
+                    ${
+                        doc.allow_download
+                            ? "View + Download"
+                            : "View Only"
                     }
                 </span>
             </td>
@@ -103,14 +110,23 @@ function renderSharedDocuments(documents) {
 
                 ${
                     doc.allow_download
-                        ? `
-                            <button
-                                class="download-btn"
-                                onclick="downloadDocument('${doc.id}')"
-                            >
-                                Download
-                            </button>
-                        `
+                        ? hasReachedDownloadLimit(doc)
+                            ? `
+                                <button
+                                    class="download-btn"
+                                    disabled
+                                >
+                                    Limit Reached
+                                </button>
+                            `
+                            : `
+                                <button
+                                    class="download-btn"
+                                    onclick="downloadDocument('${doc.id}')"
+                                >
+                                    Download
+                                </button>
+                            `
                         : ""
                 }
             </td>
@@ -209,14 +225,23 @@ function renderDocuments(documents) {
 
                 ${
                     doc.status === "approved" && doc.allow_download
-                        ? `
-                            <button
-                                class="download-btn"
-                                onclick="downloadDocument('${doc.id}')"
-                            >
-                                Download
-                            </button>
-                        `
+                        ? hasReachedDownloadLimit(doc)
+                            ? `
+                                <button
+                                    class="download-btn"
+                                    disabled
+                                >
+                                    Limit Reached
+                                </button>
+                            `
+                            : `
+                                <button
+                                    class="download-btn"
+                                    onclick="downloadDocument('${doc.id}')"
+                                >
+                                    Download
+                                </button>
+                            `
                         : ""
                 }
             </td>
