@@ -427,6 +427,21 @@ async function downloadDocument(documentId) {
         await loadEmployeeDashboard();
 
     } catch (error) {
+        if (
+            error.status === 403
+            && error.data?.message === "Download limit reached"
+        ) {
+            const usedDownloads = error.data.download_count;
+            const downloadLimit = error.data.download_limit;
+
+            alert(
+                `Download limit reached. You have used ${usedDownloads} of ${downloadLimit} allowed downloads.`
+            );
+
+            await loadEmployeeDashboard();
+            return;
+        }
+
         alert(error.message);
     }
 }
