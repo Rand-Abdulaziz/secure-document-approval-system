@@ -118,8 +118,7 @@ function renderDocuments(documents) {
 
             <td>
 
-                ${
-                doc.status === "pending"
+                ${doc.status === "pending"
 
                 ?
 
@@ -141,7 +140,7 @@ function renderDocuments(documents) {
                 :
 
                 "-"
-                }
+            }
 
             </td>
 
@@ -163,6 +162,10 @@ async function approveDocument(id) {
 
 
     try {
+
+        const confirmed = confirm("Are you sure you want to approve this document?");
+
+        if (!confirmed) return;
 
 
         await apiRequest(`/documents/${id}/approve`, {
@@ -195,8 +198,14 @@ async function rejectDocument(id) {
 
     try {
 
-
         const reason = prompt("Reason for rejection:");
+
+        if (reason === null) return;
+
+        if (!reason.trim()) {
+            alert("A rejection reason is required.");
+            return;
+        }
 
 
 
@@ -206,7 +215,7 @@ async function rejectDocument(id) {
 
             body: JSON.stringify({
 
-                reason: reason || "No reason provided"
+                reason: reason.trim()
 
             })
 
@@ -251,20 +260,20 @@ if (searchInput) {
             return (
 
                 (doc.original_filename || "")
-                .toLowerCase()
-                .includes(keyword)
+                    .toLowerCase()
+                    .includes(keyword)
 
                 ||
 
                 (doc.uploaded_by || "")
-                .toLowerCase()
-                .includes(keyword)
+                    .toLowerCase()
+                    .includes(keyword)
 
                 ||
 
                 (doc.status || "")
-                .toLowerCase()
-                .includes(keyword)
+                    .toLowerCase()
+                    .includes(keyword)
 
             );
 

@@ -172,6 +172,12 @@ async function approveWithSettings(id) {
 
     try {
 
+        const confirmed = confirm(
+            "Are you sure you want to approve this document?"
+        );
+
+        if (!confirmed) return;
+
         const checkbox = document.getElementById(`download-${id}`);
 
         const limitInput = document.getElementById(`limit-${id}`);
@@ -230,6 +236,12 @@ async function rejectDocument(id) {
 
         const reason = prompt("Reason for rejection:");
 
+        if (reason === null) return;
+
+        if (!reason.trim()) {
+            alert("A rejection reason is required.");
+            return;
+        }
 
 
         await apiRequest(`/documents/${id}/reject`, {
@@ -238,7 +250,7 @@ async function rejectDocument(id) {
 
             body: JSON.stringify({
 
-                reason: reason || "No reason provided"
+                reason: reason.trim()
 
             })
 
