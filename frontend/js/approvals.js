@@ -361,6 +361,25 @@ const cancelRejectButton =
 
 const confirmRejectButton =
     document.getElementById("confirmRejectButton");
+const rejectModal = document.getElementById("rejectModal");
+
+if (rejectModal) {
+    rejectModal.addEventListener("click", (event) => {
+        if (event.target === rejectModal) {
+            closeRejectModal();
+        }
+    });
+}
+
+document.addEventListener("keydown", (event) => {
+    if (
+        event.key === "Escape"
+        && rejectModal
+        && rejectModal.style.display === "flex"
+    ) {
+        closeRejectModal();
+    }s
+});
 
 if (closeRejectModalButton) {
     closeRejectModalButton.addEventListener("click", closeRejectModal);
